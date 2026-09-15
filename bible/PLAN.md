@@ -17,13 +17,16 @@ Phone first Bible reader. Plain HTML, CSS and JS, no build step. Lives in `bible
   After that every push deploys automatically to https://gabi-bible.netlify.app.
 - Until then the app is published as a Claude artifact (link in the chat).
 
+## v2 (done)
+- Search: full text with match highlighting, grouped by book. A reference like "Psalm 23:1" or "john 3" jumps straight there.
+- Tap a verse: Highlight (yellow, persists), Save (Saved screen on Home), Copy.
+- Reading plans: "New Testament in 90 days" and "Psalms and Proverbs in 31 days" (5 psalms + 1 proverb a day).
+  Progress is by completion, not by calendar date, so a missed day never piles up. Next button follows the plan.
+
 ## Next (in priority order, each is small and independent)
-1. Search: full text search across the loaded translation, results grouped by book, tap to open with the verse highlighted.
-2. Highlights and bookmarks: tap a verse to highlight (one color) or save it; a Saved screen on Home.
-3. Reading plans: "New Testament in 90 days" and "Psalms and Proverbs in a month", one tap per day from Home.
-4. Streak and daily nudge: days in a row on Home, optional notification at a chosen time (needs push, only works when hosted with a service worker, so after Netlify link).
-5. Share a verse as an image (canvas render, share sheet).
-6. Portuguese translation option (public domain: Almeida 1911 / "Bíblia Livre") if wanted.
+1. Streak and daily nudge: days in a row on Home, optional notification at a chosen time (needs push, only works when hosted with a service worker, so after Netlify link).
+2. Share a verse as an image (canvas render, share sheet).
+3. Portuguese translation option (public domain: Almeida 1911 / "Bíblia Livre") if wanted.
 
 ## Rules for whoever continues
 - Keep it one screen at a time, big touch targets, few words. The user has ADHD and reads visually.
