@@ -125,6 +125,31 @@ h1{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.15;ma
 .loading{text-align:center;color:var(--muted);padding:40px 0}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
 .toast.on{opacity:1}
+.search-btn{display:flex;align-items:center;gap:10px;width:100%;background:var(--card);border-radius:14px;padding:12px 16px;box-shadow:var(--shadow);color:var(--muted);font-size:16px;margin-bottom:14px}
+.search-btn svg{width:20px;height:20px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round}
+.search-in{width:100%;font:inherit;font-size:17px;padding:10px 14px;border-radius:12px;border:1px solid var(--rule);background:var(--card);color:var(--ink);outline:none}
+.search-in:focus{border-color:var(--accent)}
+.hint{color:var(--muted);font-size:14px;margin:4px 0 14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.two .tile{margin:0;padding:14px}
+.two .tile .t{font-size:16px}
+.bookhead{font-family:var(--display);font-weight:600;font-size:18px;margin:16px 0 8px}
+mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
+.v.hl{background:var(--mark)}
+.v.sel{outline:2px solid var(--accent);outline-offset:1px}
+.v.focus{background:var(--soft)}
+.vbar{position:fixed;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);border-radius:14px;padding:8px 8px 8px 14px;display:none;align-items:center;gap:6px;z-index:9;box-shadow:var(--shadow)}
+.vbar.on{display:flex}
+.vbar .vref{flex:1;font-size:14px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vbar button{padding:8px 10px;border-radius:9px;background:rgba(255,255,255,.14);font-size:14px;font-weight:600;color:inherit}
+.vbar button.on{background:var(--accent);color:var(--accent-ink)}
+.card .x{float:right;color:var(--muted);font-size:20px;line-height:1;padding:0 4px;margin:-4px -8px 0 8px}
+.check{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 0;border-top:1px solid var(--rule);font-size:17px}
+.check .box{width:26px;height:26px;border-radius:8px;border:2px solid var(--rule);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.check.done .box{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.check.done{color:var(--muted)}
+.check .box svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.plan-day{font-family:var(--display);font-size:26px;font-weight:600;margin:6px 0 2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -136,6 +161,7 @@ h1{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.15;ma
       <div class="eyebrow" id="dateLine"></div>
       <h1 id="greeting">Good morning</h1>
     </div>
+    <button class="search-btn" id="searchOpen"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>Search the Bible</span></button>
     <div class="today">
       <div class="eyebrow">Today's verse</div>
       <div class="verse" id="todayText">Loading the Bible for the first time…</div>
@@ -150,12 +176,19 @@ h1{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.15;ma
       </div>
       <span class="go"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
     </button>
-    <button class="tile" id="browseTile">
-      <div class="num">66</div>
-      <div><div class="t">All books</div><div class="s">Genesis to Revelation</div></div>
-      <span class="go"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
-    </button>
+    <div id="planHome"></div>
+    <div class="two">
+      <button class="tile" id="browseTile">
+        <div class="num">66</div>
+        <div><div class="t">Books</div><div class="s">All 66</div></div>
+      </button>
+      <button class="tile" id="savedTile">
+        <div class="num" id="savedCount">0</div>
+        <div><div class="t">Saved</div><div class="s">Your verses</div></div>
+      </button>
+    </div>
     <div class="section"><h2>Collections</h2><div id="collections"></div></div>
+    <div class="section" id="plansSection"><h2>Reading plans</h2><div id="plans"></div></div>
     <div class="stat" id="stat"></div>
   </div>
 </section>
@@ -168,6 +201,10 @@ h1{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.15;ma
       <button class="icon-btn" id="readAa" aria-label="Text settings"><svg viewBox="0 0 24 24"><path d="M4 18L10 5l6 13M6.5 13h7"/><path d="M17 11l2 7 2-7"/></svg></button>
     </div>
     <div class="reading" id="readBody"></div>
+    <div class="vbar" id="vbar">
+      <span class="vref" id="vbarRef"></span>
+      <button id="vHl">Highlight</button><button id="vSave">Save</button><button id="vCopy">Copy</button>
+    </div>
     <div class="nav">
       <button class="btn ghost" id="prevCh">← Previous</button>
       <button class="btn" id="nextCh">Next →</button>
@@ -204,6 +241,40 @@ h1{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.15;ma
     </div>
     <p id="colSub" style="color:var(--muted);margin:0 0 14px"></p>
     <div id="colList"></div>
+  </div>
+</section>
+
+<section id="search" class="screen">
+  <div class="wrap">
+    <div class="bar">
+      <button class="icon-btn" id="searchBack" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <div class="grow"><input class="search-in" id="searchIn" type="search" placeholder="Word, phrase, or John 3:16" autocomplete="off" autocapitalize="off"></div>
+    </div>
+    <p class="hint" id="searchHint">Type at least 3 letters. Or a reference like Psalm 23.</p>
+    <div id="searchList"></div>
+  </div>
+</section>
+
+<section id="saved" class="screen">
+  <div class="wrap">
+    <div class="bar">
+      <button class="icon-btn" id="savedBack" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <div class="grow pick-title" style="margin:0">Saved</div>
+    </div>
+    <p class="hint" id="savedHint">Tap a verse while reading, then Save.</p>
+    <div id="savedList"></div>
+  </div>
+</section>
+
+<section id="plan" class="screen">
+  <div class="wrap">
+    <div class="bar">
+      <button class="icon-btn" id="planBack" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <div class="grow pick-title" style="margin:0" id="planTitle"></div>
+    </div>
+    <p class="hint" id="planSub"></p>
+    <div class="today" id="planCard"></div>
+    <button class="btn ghost" id="planStop" style="width:100%">Stop this plan</button>
   </div>
 </section>
 
