@@ -29,12 +29,17 @@ COUNT = 6
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 API_ROOT = "https://generativelanguage.googleapis.com/v1beta/models"
 
-# Nano Banana. Tried in order; first one that returns an image wins.
+IMAGE_SIZE = os.environ.get("GEMINI_IMAGE_SIZE") or "1K"
+
+# Same order REND uses (stage/stage/imagepass.py, ladeene/nano_banana.py):
+# Nano Banana Pro first, 2.5 flash only when the preview id is not on the key.
 MODELS = [
-    os.environ.get("GEMINI_IMAGE_MODEL") or "gemini-2.5-flash-image",
-    "gemini-3-pro-image-preview",
-    "gemini-2.0-flash-preview-image-generation",
+    os.environ.get("GEMINI_IMAGE_MODEL") or "gemini-3-pro-image-preview",
+    "gemini-2.5-flash-image",
 ]
+
+# Only Nano Banana Pro accepts imageSize; 2.5 flash rejects the field.
+SIZE_CAPABLE = ("gemini-3-pro-image", "gemini-3.1-pro-image")
 
 
 def api_key():
@@ -46,11 +51,15 @@ def api_key():
 
 def request_image(model, key):
     """Return raw image bytes for one generation, or raise."""
+    image_config = {"aspectRatio": "1:1"}
+    if any(model.startswith(prefix) for prefix in SIZE_CAPABLE):
+        image_config["imageSize"] = IMAGE_SIZE
+
     body = json.dumps({
         "contents": [{"parts": [{"text": PROMPT}]}],
         "generationConfig": {
             "responseModalities": ["IMAGE"],
-            "imageConfig": {"aspectRatio": "1:1"},
+            "imageConfig": image_config,
         },
     }).encode()
 
@@ -76,7 +85,7 @@ def pick_model(key):
     for model in MODELS:
         try:
             data = request_image(model, key)
-            print(f"model: {model}")
+            print(f"model: {model} @ {IMAGE_SIZE}")
             return model, data
         except (urllib.error.HTTPError, urllib.error.URLError, RuntimeError) as err:
             detail = err.read().decode()[:300] if isinstance(err, urllib.error.HTTPError) else str(err)
