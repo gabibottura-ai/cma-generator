@@ -15,12 +15,14 @@ import urllib.error
 import urllib.request
 
 PROMPT = (
-    "Cute cuddly 3D character, soft plush doll style, matte felt and boucle texture, "
-    "warm studio light, pastel backdrop. A small round ottoman character named Otto: "
-    "warm oatmeal boucle body with visible nubby texture, four short tapered walnut wood legs, "
-    "small beady black eyes with heavy half closed lids, flat unimpressed mouth. "
-    "A yellow measuring tape draped around him like a scarf. Plain soft sage green background. "
-    "Front facing, full body, centered, square format, mouth closed."
+    "Cute cuddly 3D character, soft plush doll style, matte felt and boucle texture, warm studio "
+    "light. A small round ottoman character named Otto: warm oatmeal boucle body with visible "
+    "nubby texture, four short tapered walnut wood legs. His face covers most of the front of his "
+    "body: big round dark eyes with heavy half closed lids giving a dry unimpressed look, a wide "
+    "flat mouth with a clear visible lip line, mouth closed. A yellow measuring tape draped "
+    "around him like a scarf. Plain soft sage green background. Front facing, centered, slightly "
+    "close framing so the face is large, square format, high contrast between face and body so it "
+    "reads at small size."
 )
 
 COUNT = 6
